@@ -4,6 +4,7 @@ namespace Umobi\Bot;
 
 use Umobi\Bot\Handlers\HandlerContract;
 use Umobi\Bot\Models\Message;
+use Umobi\Bot\Models\MessageCollection;
 
 class BotClient {
 
@@ -81,6 +82,16 @@ class BotClient {
 
     public function callHandler($name, $senderId, $message, $payload) {
         $messageResponse = $this->processhandler($name, $senderId, $message, $payload);
+
+        if ($messageResponse instanceof  MessageCollection) {
+            usleep($messageResponse->getInitialDelay());
+
+            foreach ($messageResponse as $message) {
+                $this->call('me/messages', $message->getData());
+                usleep($messageResponse->getDelayInterval());
+            }
+        }
+
         if ($messageResponse instanceof Message) {
             return $this->call('me/messages', $messageResponse->getData());
         }
