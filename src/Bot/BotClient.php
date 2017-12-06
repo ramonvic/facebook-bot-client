@@ -60,8 +60,10 @@ class BotClient {
 
     public function sendFallbackMessage($senderId)
     {
-        $message = new Message($senderId, "Não entendemos sua mensagem 😳, ainda estamos aprendendo a ler. \n" .
-            "Mas não se preocupe, nosso professor irá te ajudar.");
+        $message = new Message($senderId, "Não entendemos sua mensagem 😳, ainda estamos aprendendo a ler.");
+        $this->call('me/messages', $message->getData());
+        usleep(500);
+        $message = new Message($senderId, "Mas não se preocupe, nosso professor irá te ajudar.");
         $this->call('me/messages', $message->getData());
         return ['general', null];
     }
