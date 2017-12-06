@@ -1,0 +1,24 @@
+{
+    "name": "umobi/facebook-bot",
+    "description": "Bot Client to use with facebook messenger",
+    "keywords": ["umobi", "facebook-bot"],
+    "license": "MIT",
+    "authors" : [
+        {
+            "name": "Ramon Vicente",
+            "email": "ramon@umobi.com.br"
+        }
+    ],
+    "version": "1.0.2",
+    "require": {
+        "php": ">=5.6.4"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Umobi\\Bot\\": "src/Bot"
+        }
+    }
+}
