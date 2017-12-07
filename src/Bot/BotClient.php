@@ -86,11 +86,11 @@ class BotClient {
         $messageResponse = $this->processhandler($name, $senderId, $message, $payload);
 
         if ($messageResponse instanceof  MessageCollection) {
-            usleep($messageResponse->getInitialDelay());
+            sleep($messageResponse->getInitialDelay());
 
             foreach ($messageResponse as $message) {
                 $this->call('me/messages', $message->getData());
-                usleep($messageResponse->getDelayInterval());
+                sleep($messageResponse->getDelayInterval());
             }
         }
 
@@ -99,6 +99,22 @@ class BotClient {
         }
 
         return !!$messageResponse;
+    }
+
+    public function sendTypingOn($senderId)
+    {
+        return $this->call('me/messages', [
+            'recipient' => [ 'id' => $senderId ],
+            'sender_action' => 'typing_on'
+        ]);
+    }
+
+    public function sendTypingOff($senderId)
+    {
+        return $this->call('me/messages', [
+            'recipient' => [ 'id' => $senderId ],
+            'sender_action' => 'typing_off'
+        ]);
     }
 
     public function call($url, $data, $type = self::TYPE_POST)

@@ -7,10 +7,10 @@ class MessageCollection implements \IteratorAggregate
 {
     protected $items = [];
 
-    protected $delayInterval = 100;
-    protected $initialDelay = 500;
+    protected $delayInterval = 0.1;
+    protected $initialDelay = 0.5;
 
-    public function __construct($items, $initialDelay = 500, $delayInterval = 100)
+    public function __construct($items, $initialDelay = 0.5, $delayInterval = 0.1)
     {
         $this->items = $items;
         $this->delayInterval = $initialDelay;
