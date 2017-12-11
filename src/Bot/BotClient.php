@@ -32,14 +32,16 @@ class BotClient {
             return $this->handlePostback($senderId, $message['quick_reply']);
         } else if (isset($message['attachments']) && $message['attachments'][0]['type'] == 'location') {
             $location = $message['attachments'][0];
-            if ($this->callHandler('location', $senderId, $message, $location)) {
-                return ['location', $location];
+            if ($formattedPayload = $this->callHandler('location', $senderId, $message, $location)) {
+                $formattedPayload['raw_payload'] = $location;
+                return ['location', $formattedPayload];
             }
         } else if (is_array($message['nlp'])) {
             foreach ($message['nlp']['entities'] as $name => $entities) {
                 $entity = $entities[0];
-                if ($entity['confidence'] > 0.6 && $this->callHandler($name, $senderId, $message, $entity)) {
-                    return [$name, $entity];
+                if ($entity['confidence'] > 0.6 && ($formattedPayload = $this->callHandler($name, $senderId, $message, $entity))) {
+                    $formattedPayload['raw_payload'] = $entity;
+                    return [$name, $formattedPayload];
                 }
             }
         }
@@ -50,8 +52,9 @@ class BotClient {
     public function handlePostback($senderId, $message)
     {
         if ($message['payload'] && ($payload = unserialize(base64_decode($message['payload'])))) {
-            if ($this->callHandler($payload['action'], $senderId, $message, $payload)) {
-                return [$payload['action'], $payload];
+            if ($formattedPayload = $this->callHandler($payload['action'], $senderId, $message, $payload)) {
+                $formattedPayload['raw_payload'] = $payload;
+                return [$payload['action'], $formattedPayload];
             }
         }
 
@@ -92,13 +95,11 @@ class BotClient {
                 $this->call('me/messages', $message->getData());
                 sleep($messageResponse->getDelayInterval());
             }
+            return $messageResponse->getFormattedPayload();
+        } else if ($messageResponse instanceof Message) {
+            $this->call('me/messages', $messageResponse->getData());
+            return $messageResponse->getFormatedPayload();
         }
-
-        if ($messageResponse instanceof Message) {
-            return $this->call('me/messages', $messageResponse->getData());
-        }
-
-        return !!$messageResponse;
     }
 
     public function sendTypingOn($senderId)
